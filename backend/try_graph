@@ -1,0 +1,20 @@
+from app.agents.graph import graph
+from app.schemas import EmailInput
+
+EMAIL_VAGA = """
+Olá! Recebemos sua candidatura para a vaga de Engenheiro de IA Júnior na Acme Tech.
+Seu perfil foi selecionado para um teste técnico em Python e FastAPI,
+com prazo até sexta-feira. Requisitos: Python, FastAPI, SQL, noções de LLMs.
+"""
+
+EMAIL_SPAM = """
+Super promoção! Ganhe 50% de desconto em todos os cursos online somente hoje.
+Clique agora e garanta sua vaga na nossa turma de marketing digital.
+"""
+
+for nome, texto in [("VAGA", EMAIL_VAGA), ("SPAM", EMAIL_SPAM)]:
+    resultado = graph.invoke({"email": EmailInput(raw_text=texto)})
+    print(f"\n=== {nome} ===")
+    print("É de vaga?", resultado["is_job_related"], "-", resultado["reason"])
+    app_result = resultado.get("application")
+    print(app_result.model_dump_json(indent=2) if app_result else "Descartado (sem extração)")
