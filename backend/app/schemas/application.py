@@ -1,7 +1,8 @@
+from datetime import datetime
 from enum import Enum
 from typing import List, Optional
-from pydantic import BaseModel, Field
 
+from pydantic import BaseModel, ConfigDict, Field
 
 class ApplicationStatus(str, Enum):
     APPLIED = "Inscrito"
@@ -30,3 +31,10 @@ class ResumeOptimization(BaseModel):
     matching_score: int = Field(ge=0, le=100)
     missing_keywords: List[str]
     suggested_bullet_points: List[str]
+
+class ApplicationRead(JobApplication):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
