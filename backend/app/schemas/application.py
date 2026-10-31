@@ -36,5 +36,19 @@ class ApplicationRead(JobApplication):
     id: int
     created_at: datetime
     updated_at: datetime
+    model_config = ConfigDict(from_attributes=True) 
+    
+class ApplicationCreate(BaseModel):
+    company_name: str = Field(min_length=1)
+    job_title: str = Field(min_length=1)
+    status: ApplicationStatus = ApplicationStatus.APPLIED
+    key_requirements: List[str] = Field(default_factory=list)
+    next_steps: Optional[str] = None
 
-    model_config = ConfigDict(from_attributes=True)
+
+class ApplicationUpdate(BaseModel):
+    company_name: Optional[str] = Field(default=None, min_length=1)
+    job_title: Optional[str] = Field(default=None, min_length=1)
+    status: Optional[ApplicationStatus] = None
+    key_requirements: Optional[List[str]] = None
+    next_steps: Optional[str] = None    
