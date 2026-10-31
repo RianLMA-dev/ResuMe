@@ -1,13 +1,25 @@
-import KanbanBoard from "@/components/KanbanBoard";
+import Image from "next/image";
+
+import Dashboard from "@/components/Dashboard";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-slate-100 p-6 text-slate-900">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold">ResuMe</h1>
-        <p className="text-sm text-slate-600">Suas candidaturas, uma coluna por etapa.</p>
+    <div className="min-h-screen">
+      <header className="border-b px-6 py-3" style={{ borderColor: "var(--line)" }}>
+        <h1>
+          <Image
+            src="/logo-dark.png"
+            alt="ResuMe"
+            width={942}
+            height={257}
+            priority
+            className="h-10 w-auto"
+          />
+        </h1>
       </header>
-      <KanbanBoard />
-    </main>
+      <main className="mx-auto max-w-[1400px] px-6 py-6">
+        <Dashboard />
+      </main>
+    </div>
   );
 }
