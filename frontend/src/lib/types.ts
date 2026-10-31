@@ -21,3 +21,13 @@ export interface Application {
   created_at: string;
   updated_at: string;
 }
+
+export const STAGE_COLOR: Record<Status, string> = {
+  Inscrito: "var(--stage-inscrito)",
+  "Em Análise": "var(--stage-analise)",
+  "Teste Técnico": "var(--stage-teste)",
+  Entrevista: "var(--stage-entrevista)",
+  Oferta: "var(--stage-oferta)",
+  Rejeitado: "var(--stage-rejeitado)",
+  Indefinido: "var(--stage-indefinido)",
+};
