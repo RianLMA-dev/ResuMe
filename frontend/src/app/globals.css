@@ -1,6 +1,33 @@
 @import "tailwindcss";
 
+/* Tema Claro (Padrão) */
 :root {
+  color-scheme: light;
+
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --card: #f1f5f9;
+  --line: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --accent: #2563eb;
+
+  --stage-inscrito: #f5b83d;
+  --stage-analise: #5b8def;
+  --stage-teste: #a78bfa;
+  --stage-entrevista: #3b82f6;
+  --stage-oferta: #22c55e;
+  --stage-rejeitado: #ef4444;
+  --stage-indefinido: #64748b;
+
+  --tag-green: #15803d;
+  --tag-yellow: #a16207;
+  --tag-blue: #1d4ed8;
+  --tag-purple: #6d28d9;
+}
+
+/* Tema Escuro (Tech-Blue do ResuMe) */
+.dark {
   color-scheme: dark;
 
   --bg: #0b1220;
@@ -11,19 +38,17 @@
   --muted: #8fa0b8;
   --accent: #2f6bff;
 
-  --stage-inscrito: #f5b83d;
-  --stage-analise: #5b8def;
-  --stage-teste: #a78bfa;
-  --stage-entrevista: #3b82f6;
-  --stage-oferta: #22c55e;
-  --stage-rejeitado: #ef4444;
-  --stage-indefinido: #64748b;
+  --tag-green: #86efac;
+  --tag-yellow: #fde047;
+  --tag-blue: #93c5fd;
+  --tag-purple: #c4b5fd;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body), system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 :focus-visible {
@@ -35,4 +60,23 @@ body {
   * {
     transition: none !important;
   }
+}
+
+.kanban-scroll::-webkit-scrollbar {
+  height: 8px; 
+}
+
+.kanban-scroll::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-radius: 9999px;
+}
+
+.kanban-scroll::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+.kanban-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }

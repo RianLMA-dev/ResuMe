@@ -9,14 +9,14 @@ const LOW_CONFIDENCE = 0.7;
 
 const AVATAR_COLORS = ["#2f6bff", "#7c3aed", "#0f766e", "#b45309", "#db2777", "#4f46e5"];
 
+// Estilos de tags adaptáveis com suporte a modo claro e escuro
 const TAG_STYLES = [
-  { bg: "rgba(34, 197, 94, 0.15)", fg: "#86efac" },
-  { bg: "rgba(234, 179, 8, 0.15)", fg: "#fde047" },
-  { bg: "rgba(59, 130, 246, 0.15)", fg: "#93c5fd" },
-  { bg: "rgba(167, 139, 250, 0.15)", fg: "#c4b5fd" },
+  { bg: "rgba(34, 197, 94, 0.15)", fg: "var(--tag-green, #15803d)" },
+  { bg: "rgba(234, 179, 8, 0.15)", fg: "var(--tag-yellow, #a16207)" },
+  { bg: "rgba(59, 130, 246, 0.15)", fg: "var(--tag-blue, #1d4ed8)" },
+  { bg: "rgba(167, 139, 250, 0.15)", fg: "var(--tag-purple, #6d28d9)" },
 ];
 
-// Transforma um texto em um número fixo, para a mesma empresa ter sempre a mesma cor.
 function hashIndex(text: string, size: number) {
   let hash = 0;
   for (const char of text) {
@@ -62,7 +62,6 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
     const card = previous.find((app) => app.id === id);
     if (!card || card.status === status) return;
 
-    // Atualiza na tela na hora e desfaz se a API recusar.
     setApplications(previous.map((app) => (app.id === id ? { ...app, status } : app)));
     setError(null);
     try {
@@ -91,13 +90,13 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
 
   return (
     <section
-      className="rounded-xl border p-5"
+      className="rounded-xl border p-5 transition-colors duration-200"
       style={{ backgroundColor: "var(--panel)", borderColor: "var(--line)" }}
     >
       <h2 className="mb-5 text-xl font-semibold">Candidaturas</h2>
 
       {error && (
-        <p className="mb-4 max-w-3xl rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+        <p className="mb-4 max-w-3xl rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-300">
           {error}
         </p>
       )}
@@ -109,7 +108,7 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
         </p>
       )}
 
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      <div className="kanban-scroll flex gap-4 overflow-x-auto pb-3 pt-1">
         {STATUSES.map((status) => {
           const cards = applications.filter((app) => app.status === status);
           return (
@@ -126,19 +125,21 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
                 const id = Number(event.dataTransfer.getData("text/plain"));
                 if (id) moveCard(id, status);
               }}
-              className="w-72 shrink-0 rounded-lg p-2 transition-colors"
+              className="relative w-72 shrink-0 overflow-hidden rounded-xl border p-3 transition-colors"
               style={{
-                backgroundColor: overColumn === status ? "rgba(47, 107, 255, 0.12)" : undefined,
+                backgroundColor: overColumn === status ? "rgba(47, 107, 255, 0.12)" : "var(--panel)",
+                borderColor: "var(--line)",
+                borderTop: `3px solid ${STAGE_COLOR[status]}`,
               }}
             >
-              <h3 className="mb-3 flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-wide">
+              <h3 className="mb-3 flex items-center justify-between px-1 text-xs font-semibold uppercase tracking-wider">
+                <span className="text-[color:var(--text)]">{status}</span>
                 <span
-                  aria-hidden
-                  className="inline-block h-4 w-4 rounded-[4px]"
-                  style={{ backgroundColor: STAGE_COLOR[status] }}
-                />
-                {status}
-                <span className="font-normal text-[color:var(--muted)]">({cards.length})</span>
+                  className="rounded-md border px-2 py-0.5 text-xs font-semibold text-[color:var(--muted)]"
+                  style={{ borderColor: "var(--line)", backgroundColor: "var(--bg)" }}
+                >
+                  {cards.length}
+                </span>
               </h3>
 
               <div className="flex flex-col gap-3">
@@ -158,7 +159,7 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
                     onDragStart={(event) =>
                       event.dataTransfer.setData("text/plain", String(app.id))
                     }
-                    className="cursor-grab rounded-lg border p-3 active:cursor-grabbing"
+                    className="cursor-grab rounded-lg border p-3 transition-colors duration-200 active:cursor-grabbing"
                     style={{
                       backgroundColor: "var(--card)",
                       borderColor:
@@ -176,7 +177,7 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
                       <button
                         onClick={() => removeCard(app.id)}
                         aria-label={`Apagar candidatura em ${app.company_name}`}
-                        className="-mr-1 -mt-1 rounded-sm px-1.5 text-[color:var(--muted)] hover:text-red-400"
+                        className="-mr-1 -mt-1 rounded-sm px-1.5 text-[color:var(--muted)] hover:text-red-500 dark:hover:text-red-400"
                       >
                         ✕
                       </button>
@@ -209,7 +210,7 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
                     )}
 
                     {app.confidence < LOW_CONFIDENCE && (
-                      <p className="mt-3 text-xs font-medium text-amber-400">
+                      <p className="mt-3 text-xs font-medium text-amber-600 dark:text-amber-400">
                         Confira: a IA teve dúvida nesta extração.
                       </p>
                     )}

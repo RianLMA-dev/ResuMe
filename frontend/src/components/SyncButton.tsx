@@ -7,9 +7,9 @@ import { ApiError, syncGmail } from "@/lib/api";
 type Message = { kind: "ok" | "info" | "error"; text: string };
 
 const STYLES: Record<Message["kind"], string> = {
-  ok: "border-green-500/40 bg-green-500/10 text-green-300",
-  info: "border-slate-500/40 bg-slate-500/10 text-slate-300",
-  error: "border-red-500/40 bg-red-500/10 text-red-300",
+  ok: "border-green-500/40 bg-green-500/10 text-green-700 dark:text-green-300",
+  info: "border-slate-500/40 bg-slate-500/10 text-slate-700 dark:text-slate-300",
+  error: "border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-300",
 };
 
 export default function SyncButton({ onSynced }: { onSynced: () => void }) {
@@ -60,7 +60,7 @@ export default function SyncButton({ onSynced }: { onSynced: () => void }) {
 
   return (
     <div
-      className="mb-4 rounded-xl border p-4"
+      className="mb-4 rounded-xl border p-4 transition-colors duration-200"
       style={{ backgroundColor: "var(--panel)", borderColor: "var(--line)" }}
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -73,7 +73,7 @@ export default function SyncButton({ onSynced }: { onSynced: () => void }) {
         <button
           onClick={handleSync}
           disabled={loading}
-          className="shrink-0 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className="shrink-0 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
           style={{ backgroundColor: "var(--accent)" }}
         >
           {loading ? "Sincronizando... pode levar um minuto" : "Sincronizar Gmail"}
