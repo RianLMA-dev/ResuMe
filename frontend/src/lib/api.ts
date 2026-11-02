@@ -47,3 +47,13 @@ export const analyzeEmail = (rawText: string) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ raw_text: rawText }),
   });
+
+  export interface GmailSyncResult {
+  checked: number;
+  saved: number;
+  discarded: number;
+  remaining: number;
+  stopped_by_error: boolean;
+}
+
+export const syncGmail = () => request<GmailSyncResult>("/gmail/sync", { method: "POST" });
