@@ -7,9 +7,9 @@ import { ApiError, analyzeEmail } from "@/lib/api";
 type Message = { kind: "ok" | "info" | "error"; text: string };
 
 const STYLES: Record<Message["kind"], string> = {
-  ok: "border-green-500/40 bg-green-500/10 text-green-300",
-  info: "border-slate-500/40 bg-slate-500/10 text-slate-300",
-  error: "border-red-500/40 bg-red-500/10 text-red-300",
+  ok: "border-green-500/40 bg-green-500/10 text-green-700 dark:text-green-300",
+  info: "border-slate-500/40 bg-slate-500/10 text-slate-700 dark:text-slate-300",
+  error: "border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-300",
 };
 
 export default function EmailForm({ onSaved }: { onSaved: () => void }) {
@@ -58,7 +58,7 @@ export default function EmailForm({ onSaved }: { onSaved: () => void }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mb-6 rounded-xl border p-4"
+      className="mb-6 rounded-xl border p-4 transition-colors duration-200"
       style={{ backgroundColor: "var(--panel)", borderColor: "var(--line)" }}
     >
       <label htmlFor="email-text" className="mb-2 block text-sm font-semibold">
@@ -70,7 +70,7 @@ export default function EmailForm({ onSaved }: { onSaved: () => void }) {
         onChange={(event) => setText(event.target.value)}
         rows={4}
         placeholder="Cole aqui o texto do e-mail..."
-        className="w-full rounded-lg border p-3 text-sm placeholder:text-[color:var(--muted)]"
+        className="w-full rounded-lg border p-3 text-sm placeholder:text-[color:var(--muted)] focus:outline-none"
         style={{ backgroundColor: "var(--bg)", borderColor: "var(--line)", color: "var(--text)" }}
       />
       <div className="mt-3 flex items-center justify-between gap-4">
@@ -80,7 +80,7 @@ export default function EmailForm({ onSaved }: { onSaved: () => void }) {
         <button
           type="submit"
           disabled={loading || text.trim().length < 10}
-          className="shrink-0 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="shrink-0 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity disabled:opacity-50"
           style={{ backgroundColor: "var(--accent)" }}
         >
           {loading ? "Analisando..." : "Analisar e-mail"}
