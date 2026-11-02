@@ -17,6 +17,14 @@ export interface EmailAnalysis {
   application: Application | null;
 }
 
+export interface GmailSyncResult {
+  checked: number;
+  saved: number;
+  discarded: number;
+  remaining: number;
+  stopped_by_error: boolean;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, init);
   if (!response.ok) {
@@ -47,3 +55,5 @@ export const analyzeEmail = (rawText: string) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ raw_text: rawText }),
   });
+
+export const syncGmail = () => request<GmailSyncResult>("/gmail/sync", { method: "POST" });

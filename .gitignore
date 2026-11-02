@@ -1,1 +1,12 @@
 .env
+backend/secrets/
+credentials.json
+token.json
+client_secret*.json
+
+backend/secrets/
+credentials.json
+token.json
+client_secret*.json
+__pycache__/
+*.pyc
