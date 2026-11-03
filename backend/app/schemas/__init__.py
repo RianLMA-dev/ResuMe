@@ -7,3 +7,5 @@ from .application import (
     JobApplication,
     ResumeOptimization,
 )
+
+from .resume import OptimizeRequest, ResumeRead, ResumeUpsert
