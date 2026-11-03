@@ -3,6 +3,8 @@
 import { useState } from "react";
 import EmailForm from "./EmailForm";
 import KanbanBoard from "./KanbanBoard";
+import SyncButton from "./SyncButton";
+import ResumePanel from "./ResumePanel";
 
 interface DashboardProps {
   searchTerm?: string;
@@ -17,7 +19,9 @@ export default function Dashboard({ searchTerm = "" }: DashboardProps) {
 
   return (
     <div className="flex flex-col gap-6">
+      <SyncButton onSynced={handleCreated} />
       <EmailForm onCreated={handleCreated} />
+      <ResumePanel />
       <KanbanBoard refreshKey={refreshKey} searchTerm={searchTerm} />
     </div>
   );

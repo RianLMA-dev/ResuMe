@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { syncGmail } from '@/lib/api'
 
 interface UserData {
   name: string
@@ -12,8 +11,6 @@ interface UserData {
 export function UserProfile() {
   const [isOpen, setIsOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isSyncing, setIsSyncing] = useState(false)
-  const [syncMessage, setSyncMessage] = useState<string | null>(null)
 
   const [user, setUser] = useState<UserData>({
     name: 'Desenvolvedor',
@@ -23,19 +20,6 @@ export function UserProfile() {
 
   const [tempUser, setTempUser] = useState<UserData>(user)
   const initialLetter = user.name.trim().charAt(0).toUpperCase() || 'U'
-
-  async function handleSync() {
-    setIsSyncing(true)
-    setSyncMessage(null)
-    try {
-      await syncGmail()
-      setSyncMessage("Sincronização iniciada em segundo plano! As vagas surgirão no board em instantes.")
-    } catch (err: any) {
-      setSyncMessage(err.message || "Erro ao sincronizar")
-    } finally {
-      setIsSyncing(false)
-    }
-  }
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -71,17 +55,6 @@ export function UserProfile() {
             </div>
 
             <div className="py-1 text-xs flex flex-col gap-1">
-              {/* Botão de Sincronizar E-mails */}
-              <button
-                onClick={handleSync}
-                disabled={isSyncing}
-                className="w-full rounded-lg px-3 py-1.5 text-left text-[color:var(--text)] transition-colors hover:bg-[color:var(--bg)] flex items-center justify-between disabled:opacity-50"
-              >
-                <span className="flex items-center gap-2">
-                  🔄 {isSyncing ? "Sincronizando..." : "Sincronizar Gmail"}
-                </span>
-              </button>
-
               <button
                 onClick={() => {
                   setIsOpen(false)
@@ -93,12 +66,6 @@ export function UserProfile() {
                 ⚙️ Configurações do Perfil
               </button>
             </div>
-
-            {syncMessage && (
-              <div className="border-t px-3 py-1.5 text-[10px] text-blue-500" style={{ borderColor: 'var(--line)' }}>
-                {syncMessage}
-              </div>
-            )}
           </div>
         </>
       )}
