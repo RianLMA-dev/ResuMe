@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+import traceback
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 
 from app.agents.optimizer import optimize_resume
 from app.db import get_db
 from app.models import ApplicationRecord, BaseResume
 from app.schemas import OptimizeRequest, ResumeOptimization, ResumeRead, ResumeUpsert
+from app.services.pdf import extract_text_from_pdf
 
 router = APIRouter(tags=["resume"])
 
@@ -50,6 +52,8 @@ def optimize(payload: OptimizeRequest, db: Session = Depends(get_db)):
     if payload.job_description and payload.job_description.strip():
         job_text = payload.job_description
     else:
+        if not payload.application_id:
+            raise HTTPException(status_code=400, detail="Informe 'job_description' ou 'application_id'.")
         record = db.get(ApplicationRecord, payload.application_id)
         if record is None:
             raise HTTPException(status_code=404, detail="Candidatura não encontrada")
@@ -57,8 +61,36 @@ def optimize(payload: OptimizeRequest, db: Session = Depends(get_db)):
 
     try:
         return optimize_resume(resume.content, job_text)
-    except Exception:
+    except Exception as e:
+        print("\n================ ERRO DETALHADO NO OPTIMIZE ================")
+        traceback.print_exc()
+        print("===========================================================\n")
         raise HTTPException(
-            status_code=502,
-            detail="A IA não conseguiu analisar agora. Pode ser o limite do Gemini: tente em um minuto.",
+            status_code=500,
+            detail=f"Erro interno no processamento com a IA: {str(e)}",
         )
+        
+@router.post("/resume/upload", response_model=ResumeRead)
+async def upload_resume_pdf(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    # Validar se o arquivo é PDF
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="O arquivo enviado deve ser no formato PDF.")
+
+    # Ler os bytes e extrair o texto
+    content_bytes = await file.read()
+    extracted_text = extract_text_from_pdf(content_bytes)
+
+    # Salvar ou atualizar no banco de dados (usando RESUME_ID = 1)
+    record = db.get(BaseResume, RESUME_ID)
+    if record is None:
+        record = BaseResume(id=RESUME_ID, content=extracted_text)
+        db.add(record)
+    else:
+        record.content = extracted_text
+
+    db.commit()
+    db.refresh(record)
+    return record

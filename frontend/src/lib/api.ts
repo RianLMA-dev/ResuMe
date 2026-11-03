@@ -57,3 +57,47 @@ export const analyzeEmail = (rawText: string) =>
   });
 
 export const syncGmail = () => request<GmailSyncResult>("/gmail/sync", { method: "POST" });
+
+export interface ResumeRead {
+  content: string;
+  updated_at: string;
+}
+
+export interface ResumeOptimization {
+  matching_score: number;
+  missing_keywords: string[];
+  suggested_bullet_points: string[];
+}
+
+export const getResume = () => request<ResumeRead>("/resume", { cache: "no-store" });
+
+export const saveResume = (content: string) =>
+  request<ResumeRead>("/resume", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+  });
+
+export const optimizeResume = (payload: { job_description?: string; application_id?: number }) =>
+  request<ResumeOptimization>("/optimize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+export async function uploadResumePdf(file: File): Promise<{ id: number; content: string; updated_at: string }> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("http://localhost:8000/resume/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new ApiError(response.status, errorData.detail || "Erro ao fazer upload do PDF.");
+  }
+
+  return response.json();
+}

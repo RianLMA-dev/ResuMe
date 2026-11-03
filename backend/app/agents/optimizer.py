@@ -1,5 +1,5 @@
 from app.schemas import ResumeOptimization
-from app.services.llm import get_llm
+from app.services.llm import get_groq_llm  
 from app.services.sanitize import sanitize_text
 
 SYSTEM_PROMPT = """Você ajuda a adaptar um currículo a uma vaga.
@@ -24,7 +24,7 @@ Regras importantes:
 
 
 def optimize_resume(resume_text: str, job_text: str) -> ResumeOptimization:
-    llm = get_llm().with_structured_output(ResumeOptimization)
+    llm = get_groq_llm().with_structured_output(ResumeOptimization)
     return llm.invoke(
         [
             ("system", SYSTEM_PROMPT),

@@ -10,7 +10,7 @@ from app.services.gmail import get_message, get_service, list_message_ids
 
 LABEL = "Vagas"
 MAX_LOOKUP = 15  
-BATCH_SIZE = 2   
+BATCH_SIZE = 5   
 
 class GmailSyncResult(BaseModel):
     checked: int
