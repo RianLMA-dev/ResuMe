@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata: Metadata = {
   title: "ResuMe",
-  description: "Suas candidaturas, da inscrição à oferta.",
+  description: "Acompanhe e gira as suas candidaturas a vagas de emprego com IA",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

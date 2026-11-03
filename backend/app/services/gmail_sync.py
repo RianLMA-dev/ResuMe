@@ -9,9 +9,8 @@ from app.services.applications import upsert_application
 from app.services.gmail import get_message, get_service, list_message_ids
 
 LABEL = "Vagas"
-MAX_LOOKUP = 50  # quantos e-mails da gaveta olhar
-BATCH_SIZE = 5  # quantos analisar por clique (cada e-mail = 2 chamadas ao Gemini)
-
+MAX_LOOKUP = 15  
+BATCH_SIZE = 2   
 
 class GmailSyncResult(BaseModel):
     checked: int
