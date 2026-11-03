@@ -42,7 +42,13 @@ function Avatar({ name }: { name: string }) {
   );
 }
 
-export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number }) {
+export default function KanbanBoard({
+  refreshKey = 0,
+  searchTerm = "",
+}: {
+  refreshKey?: number;
+  searchTerm?: string;
+}) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +116,22 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
 
       <div className="kanban-scroll flex gap-4 overflow-x-auto pb-3 pt-1">
         {STATUSES.map((status) => {
-          const cards = applications.filter((app) => app.status === status);
+          // Filtra por status E pelo termo buscado
+          const cards = applications.filter((app) => {
+            const matchesStatus = app.status === status;
+            const term = searchTerm.toLowerCase().trim();
+
+            if (!term) return matchesStatus;
+
+            const matchesCompany = app.company_name.toLowerCase().includes(term);
+            const matchesJob = app.job_title.toLowerCase().includes(term);
+            const matchesSkills = app.key_requirements.some((req) =>
+              req.toLowerCase().includes(term)
+            );
+
+            return matchesStatus && (matchesCompany || matchesJob || matchesSkills);
+          });
+
           return (
             <div
               key={status}
@@ -148,7 +169,7 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
                     className="rounded-lg border border-dashed px-3 py-6 text-center text-sm text-[color:var(--muted)]"
                     style={{ borderColor: "var(--line)" }}
                   >
-                    Arraste um cartão para cá
+                    {searchTerm ? "Nenhum resultado" : "Arraste um cartão para cá"}
                   </p>
                 )}
 
