@@ -13,8 +13,6 @@ Comecei esse projeto porque, quando você se candidata a muitas vagas ao mesmo t
 
 Também é meu projeto de portfólio na trilha de AI Engineer, então está sendo construído aos poucos e o código é aberto.
 
-![Kanban do ResuMe](docs/kanban.png)
-
 ## O que já funciona
 
 **Acompanhar candidaturas**
@@ -151,8 +149,6 @@ Os testes usam modelos e Gmail simulados e um SQLite em memória, então rodam s
 - [x] Kanban em Next.js, com tema claro e escuro
 - [x] Leitura automática do Gmail pelo marcador `Vagas`
 - [x] Resume Optimizer com currículo em PDF
-- [ ] Botão "Analisar currículo" em cada cartão do kanban
-- [ ] Logo da empresa nos cartões
 - [ ] Sincronização automática do Gmail
 - [ ] Aba de sugestões de vagas, lendo os alertas do LinkedIn e do Indeed
 - [ ] Um jeito melhor de ligar e-mails diferentes ao mesmo processo (hoje a comparação é por texto)
