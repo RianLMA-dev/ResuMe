@@ -101,3 +101,18 @@ export async function uploadResumePdf(file: File): Promise<{ id: number; content
 
   return response.json();
 }
+
+export async function optimizeForApplication(applicationId: number) {
+  const response = await fetch("http://127.0.0.1:8000/optimize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ application_id: applicationId }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Erro ao analisar currículo.");
+  }
+
+  return response.json();
+}

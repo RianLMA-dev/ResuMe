@@ -1,3 +1,4 @@
+import os
 from pydantic import BaseModel, Field
 
 from app.schemas import EmailInput
@@ -19,7 +20,7 @@ class EmailClassification(BaseModel):
 
 def classify_email(email: EmailInput) -> EmailClassification:
     clean_text = sanitize_text(email.raw_text)
-    llm = get_llm().with_structured_output(EmailClassification)
+    llm = get_llm(model=os.getenv("GEMINI_CLASSIFIER_MODEL") or None).with_structured_output(EmailClassification)
     return llm.invoke(
         [
             ("system", SYSTEM_PROMPT),
