@@ -6,7 +6,7 @@ from app.agents.optimizer import optimize_resume
 from app.db import get_db
 from app.models import ApplicationRecord, BaseResume
 from app.schemas import OptimizeRequest, ResumeOptimization, ResumeRead, ResumeUpsert
-from app.services.pdf import extract_text_from_pdf
+from app.services.pdf import extract_text_from_pdf, clean_text
 
 router = APIRouter(tags=["resume"])
 
@@ -75,15 +75,21 @@ async def upload_resume_pdf(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    # Validar se o arquivo é PDF
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="O arquivo enviado deve ser no formato PDF.")
 
-    # Ler os bytes e extrair o texto
     content_bytes = await file.read()
-    extracted_text = extract_text_from_pdf(content_bytes)
+    raw_text = extract_text_from_pdf(content_bytes)
+    
+    # Normaliza o texto extraído do PDF
+    extracted_text = clean_text(raw_text)
 
-    # Salvar ou atualizar no banco de dados (usando RESUME_ID = 1)
+    if not extracted_text or len(extracted_text) < 20:
+        raise HTTPException(
+            status_code=400, 
+            detail="Não foi possível extrair texto válido do PDF."
+        )
+
     record = db.get(BaseResume, RESUME_ID)
     if record is None:
         record = BaseResume(id=RESUME_ID, content=extracted_text)

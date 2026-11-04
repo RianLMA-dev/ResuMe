@@ -65,3 +65,4 @@ def delete_application(application_id: int, db: Session = Depends(get_db)):
     db.delete(record)
     db.commit()
     return Response(status_code=204)
+
