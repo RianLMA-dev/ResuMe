@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+
 class ApplicationStatus(str, Enum):
     APPLIED = "Inscrito"
     IN_REVIEW = "Em Análise"
@@ -16,11 +17,13 @@ class ApplicationStatus(str, Enum):
 
 class EmailInput(BaseModel):
     raw_text: str = Field(min_length=10)
+    sender_email: Optional[str] = Field(default=None, description="E-mail do remetente para extração do domínio")
 
 
 class JobApplication(BaseModel):
     company_name: str
     job_title: str
+    company_domain: Optional[str] = Field(default=None, description="Domínio limpo da empresa (ex: stefanini.com)")
     status: ApplicationStatus
     key_requirements: List[str] = Field(default_factory=list)
     next_steps: Optional[str] = None
@@ -32,15 +35,18 @@ class ResumeOptimization(BaseModel):
     missing_keywords: List[str]
     suggested_bullet_points: List[str]
 
+
 class ApplicationRead(JobApplication):
     id: int
     created_at: datetime
     updated_at: datetime
-    model_config = ConfigDict(from_attributes=True) 
-    
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ApplicationCreate(BaseModel):
     company_name: str = Field(min_length=1)
     job_title: str = Field(min_length=1)
+    company_domain: Optional[str] = None
     status: ApplicationStatus = ApplicationStatus.APPLIED
     key_requirements: List[str] = Field(default_factory=list)
     next_steps: Optional[str] = None
@@ -49,6 +55,7 @@ class ApplicationCreate(BaseModel):
 class ApplicationUpdate(BaseModel):
     company_name: Optional[str] = Field(default=None, min_length=1)
     job_title: Optional[str] = Field(default=None, min_length=1)
+    company_domain: Optional[str] = None
     status: Optional[ApplicationStatus] = None
     key_requirements: Optional[List[str]] = None
-    next_steps: Optional[str] = None    
+    next_steps: Optional[str] = None

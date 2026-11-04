@@ -17,6 +17,7 @@ def upsert_application(db: Session, data: JobApplication) -> ApplicationRecord:
         record = ApplicationRecord(
             company_name=data.company_name,
             job_title=data.job_title,
+            company_domain=data.company_domain,  # <-- NOVO: Salva ao criar
             status=data.status.value,
             key_requirements=data.key_requirements,
             next_steps=data.next_steps,
@@ -24,6 +25,8 @@ def upsert_application(db: Session, data: JobApplication) -> ApplicationRecord:
         )
         db.add(record)
     else:
+        if data.company_domain:  # <-- NOVO: Atualiza se houver um domínio válido
+            record.company_domain = data.company_domain
         if data.status != ApplicationStatus.UNKNOWN:
             record.status = data.status.value
         if data.next_steps:

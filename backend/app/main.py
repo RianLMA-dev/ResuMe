@@ -38,8 +38,7 @@ app.add_middleware(
 app.include_router(emails_router)
 app.include_router(applications_router)
 app.include_router(gmail_router)
-app.include_router(resume_router)
-
+app.include_router(resume_router)   
 
 @app.get("/health")
 def health():
