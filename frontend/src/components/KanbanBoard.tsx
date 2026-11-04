@@ -17,6 +17,16 @@ const TAG_STYLES = [
   { bg: "rgba(167, 139, 250, 0.15)", fg: "var(--tag-purple, #6d28d9)" },
 ];
 
+// Dicionário opcional para empresas com domínios específicos que não seguem o padrão .com direto
+const KNOWN_DOMAINS: Record<string, string> = {
+  stefanini: "stefanini.com",
+  stefaninigroup: "stefanini.com",
+  grupoautoglass: "autoglass.com.br",
+  autoglass: "autoglass.com.br",
+  compassuol: "compass.uol",
+  compass: "compass.uol",
+};
+
 function hashIndex(text: string, size: number) {
   let hash = 0;
   for (const char of text) {
@@ -29,16 +39,46 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 }
 
-function Avatar({ name }: { name: string }) {
+function CompanyLogo({ name, domain }: { name: string; domain?: string | null }) {
+  const [imgError, setImgError] = useState(false);
+
+  // Se o backend não enviou o domain (candidaturas antigas), limpa o nome da empresa como fallback
+  const fallbackDomain = name
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+
+  const activeDomain = domain || (fallbackDomain ? `${fallbackDomain}.com` : "");
+
   const initial = name.trim().charAt(0).toUpperCase() || "?";
+  const avatarBg = AVATAR_COLORS[hashIndex(name, AVATAR_COLORS.length)];
+
+  if (imgError || !activeDomain) {
+    return (
+      <span
+        aria-hidden
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-base font-bold text-white shadow-sm"
+        style={{ backgroundColor: avatarBg }}
+      >
+        {initial}
+      </span>
+    );
+  }
+
   return (
-    <span
-      aria-hidden
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-base font-bold text-white"
-      style={{ backgroundColor: AVATAR_COLORS[hashIndex(name, AVATAR_COLORS.length)] }}
+    <div
+      className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-white p-1 shadow-sm"
+      style={{ borderColor: "var(--line)" }}
     >
-      {initial}
-    </span>
+      <img
+        src={`https://logo.clearbit.com/${activeDomain}`}
+        alt={`Logo da ${name}`}
+        className="h-full w-full object-contain"
+        onError={() => setImgError(true)}
+      />
+    </div>
   );
 }
 
@@ -116,7 +156,6 @@ export default function KanbanBoard({
 
       <div className="kanban-scroll flex gap-4 overflow-x-auto pb-3 pt-1">
         {STATUSES.map((status) => {
-          // Filtra por status E pelo termo buscado
           const cards = applications.filter((app) => {
             const matchesStatus = app.status === status;
             const term = searchTerm.toLowerCase().trim();
@@ -188,7 +227,7 @@ export default function KanbanBoard({
                     }}
                   >
                     <div className="flex items-start gap-3">
-                      <Avatar name={app.company_name} />
+                      <CompanyLogo name={app.company_name} />
                       <div className="min-w-0 flex-1">
                         <h4 className="truncate text-sm font-semibold">{app.job_title}</h4>
                         <p className="truncate text-sm text-[color:var(--muted)]">
@@ -204,7 +243,7 @@ export default function KanbanBoard({
                       </button>
                     </div>
 
-                    {app.key_requirements.length > 0 && (
+                    {app.key_requirements && app.key_requirements.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-1.5">
                         {app.key_requirements.map((req) => {
                           const tag = TAG_STYLES[hashIndex(req, TAG_STYLES.length)];
@@ -236,7 +275,7 @@ export default function KanbanBoard({
                       </p>
                     )}
 
-                    <p className="mt-3 text-xs text-[color:var(--muted)]">
+                    <p className="mt-3 text-right text-[10px] text-[color:var(--muted)]">
                       Atualizado em {formatDate(app.updated_at)}
                     </p>
                   </article>

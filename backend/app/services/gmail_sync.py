@@ -1,3 +1,4 @@
+import time  # <--- IMPORTANTE: Importado para controlar o ritmo das requisições
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -8,9 +9,13 @@ from app.schemas import EmailInput
 from app.services.applications import upsert_application
 from app.services.gmail import get_message, get_service, list_message_ids
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 LABEL = "Vagas"
-MAX_LOOKUP = 15  
-BATCH_SIZE = 5   
+MAX_LOOKUP = 10  
+BATCH_SIZE = 5  # Aumentado com segurança pois agora há throttling entre cada chamada
 
 class GmailSyncResult(BaseModel):
     checked: int
@@ -38,6 +43,7 @@ def sync_gmail(db: Session) -> GmailSyncResult:
         try:
             result = graph.invoke({"email": EmailInput(raw_text=message["text"])})
         except Exception:
+            logger.exception("Falha ao processar o e-mail %s", message_id)
             stopped = True
             break
 
@@ -53,6 +59,10 @@ def sync_gmail(db: Session) -> GmailSyncResult:
 
         db.add(ProcessedEmail(gmail_id=message_id, outcome=outcome, application_id=application_id))
         db.commit()
+
+        # ===> PAUSA OBRIGATÓRIA ENTRE REQUISIÇÕES <===
+        # Garante no máximo ~13 chamadas por minuto (abaixo do limite de 15 RPM da API)
+        time.sleep(4.5)
 
     processed = saved + discarded
     return GmailSyncResult(

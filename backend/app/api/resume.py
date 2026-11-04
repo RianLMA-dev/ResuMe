@@ -62,9 +62,7 @@ def optimize(payload: OptimizeRequest, db: Session = Depends(get_db)):
     try:
         return optimize_resume(resume.content, job_text)
     except Exception as e:
-        print("\n================ ERRO DETALHADO NO OPTIMIZE ================")
         traceback.print_exc()
-        print("===========================================================\n")
         raise HTTPException(
             status_code=500,
             detail=f"Erro interno no processamento com a IA: {str(e)}",

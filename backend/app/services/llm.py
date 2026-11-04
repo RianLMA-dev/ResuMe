@@ -7,7 +7,7 @@ from langchain_groq import ChatGroq
 load_dotenv()
 
 
-def get_llm(temperature: float = 0.0) -> BaseChatModel:
+def get_llm(temperature: float = 0.0, model: str | None = None) -> BaseChatModel:
     """Devolve o modelo de chat conforme LLM_PROVIDER no .env."""
     provider = os.getenv("LLM_PROVIDER", "gemini").lower()
 
@@ -15,7 +15,7 @@ def get_llm(temperature: float = 0.0) -> BaseChatModel:
         from langchain_google_genai import ChatGoogleGenerativeAI
 
         return ChatGoogleGenerativeAI(
-            model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
+            model=model or os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
             temperature=temperature,
         )
 

@@ -1,4 +1,5 @@
 import re
+import time
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -46,8 +47,10 @@ def analyze_email(email: EmailInput, db: Session = Depends(get_db)):
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Falha ao processar o e-mail: {exc}")
 
+    time.sleep(4.5)
+
     saved = None
-    if result.get("application"):
+    if result.get("application"): 
         app_data = result["application"]
         
         # Extrai o domínio exato do remetente sem gastar tokens da IA

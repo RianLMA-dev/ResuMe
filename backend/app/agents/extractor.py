@@ -1,3 +1,5 @@
+import os
+
 from app.schemas import EmailInput, JobApplication
 from app.services.llm import get_llm
 from app.services.sanitize import sanitize_text
@@ -16,7 +18,7 @@ Regras:
 def extract_application(email: EmailInput) -> JobApplication:
     clean_text = sanitize_text(email.raw_text)
 
-    llm = get_llm().with_structured_output(JobApplication)
+    llm = get_llm(model=os.getenv("GEMINI_EXTRACTOR_MODEL") or None).with_structured_output(JobApplication)
     return llm.invoke(
         [
             ("system", SYSTEM_PROMPT),
