@@ -68,7 +68,7 @@ O fluxo dos e-mails é um grafo do LangGraph, e cada etapa é um nó separado. I
 - Agentes: LangGraph
 - Banco de dados: PostgreSQL
 - Leitura dos e-mails (Classifier e Extractor): Gemini, ou Ollama para rodar um modelo local
-- Resume Optimizer: Grok, da xAI
+- Resume Optimizer: Groq
 - Gmail: API do Gmail com acesso somente leitura
 - Front-end: Next.js, React e Tailwind CSS
 - Testes: Pytest
