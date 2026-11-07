@@ -2,6 +2,7 @@ services:
   db:
     image: postgres:16
     container_name: resume-db
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-resume}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-resume}
@@ -10,7 +11,40 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: resume-backend
     restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-resume}:${POSTGRES_PASSWORD:-resume}@db:5432/${POSTGRES_DB:-resume}
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/secrets:/app/secrets
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    container_name: resume-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
 
 volumes:
   pgdata:
