@@ -20,7 +20,7 @@ export default function Dashboard({ searchTerm = "" }: DashboardProps) {
   return (
     <div className="flex flex-col gap-6">
       <SyncButton onSynced={handleCreated} />
-      <EmailForm onCreated={handleCreated} />
+      <EmailForm onSaved={handleCreated} />
       <ResumePanel />
       <KanbanBoard refreshKey={refreshKey} searchTerm={searchTerm} />
     </div>
