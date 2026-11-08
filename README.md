@@ -249,7 +249,7 @@ Os testes usam modelos e Gmail simulados e um SQLite em memória, então rodam s
 - [x] Sincronização automática, com pausas para respeitar os limites
 - [x] Resume Optimizer com currículo em PDF
 - [x] Projeto completo rodando com um comando (Docker Compose)
-- [ ] Integração contínua com GitHub Actions
+- [x] Integração contínua com GitHub Actions
 - [ ] Etapa de "interesse" no kanban, para analisar a vaga antes de se inscrever
 - [ ] Aba de sugestões de vagas, lendo os alertas do LinkedIn e do Indeed
 - [ ] Logo da empresa nos cartões
