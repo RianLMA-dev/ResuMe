@@ -20,6 +20,7 @@ services:
   backend:
     build: ./backend
     container_name: resume-backend
+    init: true
     restart: unless-stopped
     env_file:
       - .env
@@ -40,6 +41,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: http://localhost:8000
     container_name: resume-frontend
+    init: true
     restart: unless-stopped
     ports:
       - "3000:3000"
