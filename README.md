@@ -7,6 +7,8 @@
 
 # ResuMe
 
+![CI](https://github.com/RianLMA-dev/ResuMe/actions/workflows/ci.yml/badge.svg)
+
 O nome é um trocadilho entre _resume_ (currículo) e _me_ (eu). A ideia é ter um assistente pessoal para cuidar das minhas candidaturas.
 
 Comecei esse projeto porque, quando você se candidata a muitas vagas ao mesmo tempo, perde o controle rápido: em qual etapa cada processo está, quem já respondeu, quem recusou. E ainda tem o trabalho de adaptar o currículo para cada vaga. O ResuMe tenta resolver as duas coisas com agentes de IA.
