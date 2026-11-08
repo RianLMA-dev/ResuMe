@@ -10,3 +10,13 @@ token.json
 client_secret*.json
 __pycache__/
 *.pyc
+backend/logs/
+
+backend/secrets/
+backend/logs/
+credentials.json
+token.json
+client_secret*.json
+__pycache__/
+*.pyc
+*.sql
