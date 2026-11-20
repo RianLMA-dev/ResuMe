@@ -237,6 +237,35 @@ pytest -v
 
 Os testes usam modelos e Gmail simulados e um SQLite em memória, então rodam sem chaves de API e sem gastar nada.
 
+## Avaliação do classificador e do extrator
+
+Os testes automatizados simulam o modelo, então só provam que o código funciona. Para medir se a IA acerta, existe um conjunto de 53 e-mails sintéticos em `backend/evals/` (empresas e pessoas fictícias, escritos a partir do formato de e-mails reais de processos seletivos). Ele cobre os 7 status do kanban e 12 e-mails que **não** são vaga (alerta, newsletter, curso, compra, rede social), além de 4 casos ambíguos que ficam fora da nota.
+
+Última medição, com `gemini-3.5-flash-lite`:
+
+| Etapa | Resultado |
+|---|---|
+| Classificador (é processo seletivo?) | 49/49 (37 vagas, 12 não-vagas) |
+| Extrator: status | 37/37 |
+| Extrator: empresa | 37/37 |
+| Extrator: cargo | 37/37 |
+
+O que a avaliação encontrou:
+
+- Na primeira rodada, o status do extrator estava em 93%. Em e-mails como "há uma novidade, acesse a plataforma", que não dizem a etapa, o modelo chutava `Em Análise` em vez de `Indefinido`. Com 4 casos novos, escritos só para conferir, o acerto desse tipo foi de 1 em 6 para 6 em 6 depois de ajustar o prompt.
+- Esse ajuste fez o modelo errar em candidaturas "não finalizadas". Foram necessárias duas regras a mais, uma para `Inscrito` e outra de precedência para `Rejeitado`, e um novo caso de conferência para cada uma.
+- Os testes expuseram um problema do sanitizador: ele confunde números de vaga de 8 dígitos com telefone (veja "O que falta fazer").
+
+Limites desta medição: o conjunto é pequeno e foi escrito à mão, e parte dos casos orientou os ajustes do prompt, então 100% aqui **não** significa 100% com e-mails reais. O modelo escolhido também não respeita `temperature`, e o resultado varia um ou dois casos entre rodadas. Os números servem para comparar versões do prompt e achar regressões, não como garantia de acerto.
+
+Para rodar (gasta chamadas reais ao Gemini, uns 10 minutos no plano gratuito):
+
+```powershell
+cd backend
+python -m evals.run_eval
+python -m evals.run_eval --ids s29,s30   # só alguns casos
+```
+
 ## O que falta fazer
 
 - [x] Schemas e saída estruturada
@@ -250,10 +279,12 @@ Os testes usam modelos e Gmail simulados e um SQLite em memória, então rodam s
 - [x] Resume Optimizer com currículo em PDF
 - [x] Projeto completo rodando com um comando (Docker Compose)
 - [x] Integração contínua com GitHub Actions
+- [x] Avaliação do classificador e do extrator com um conjunto de e-mails sintéticos
 - [ ] Etapa de "interesse" no kanban, para analisar a vaga antes de se inscrever
 - [ ] Aba de sugestões de vagas, lendo os alertas do LinkedIn e do Indeed
 - [ ] Logo da empresa nos cartões
 - [ ] Um jeito melhor de ligar e-mails diferentes ao mesmo processo (hoje a comparação é por texto)
+- [ ] Sanitizador: não tratar números de vaga (8 dígitos) como telefone
 - [ ] Migrações com Alembic
 - [ ] Demonstração pública com dados de exemplo
 
