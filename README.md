@@ -142,7 +142,7 @@ ResuMe/
 Cada pessoa usa as próprias chaves (_bring your own key_), e o código nunca depende de uma chave minha. O `.env.example` lista todas as variáveis.
 
 - **E-mails (Classifier e Extractor):** Gemini por padrão, com `GOOGLE_API_KEY`. Existe camada gratuita, mas os limites mudam, então confira no [Google AI Studio](https://aistudio.google.com/apikey). Com `LLM_PROVIDER=ollama`, dá para rodar um modelo local.
-- **Resume Optimizer:** Groq, com `GROQ_API_KEY`. Veja os preços e limites no site [Groq](https://console.groq.com/keys).
+- **Resume Optimizer:** Groq, com `GROQ_API_KEY` e, se quiser trocar o modelo, `GROQ_MODEL`. Veja os preços e limites no site [Groq](https://console.groq.com/keys).
 
 No plano gratuito do Gemini, o limite de requisições por minuto vale por modelo. Se estourar, defina `GEMINI_CLASSIFIER_MODEL` e `GEMINI_EXTRACTOR_MODEL` com modelos diferentes, e cada etapa passa a gastar o limite de um modelo próprio. Os modelos mudam de nome e saem de catálogo com o tempo: se der erro de modelo não encontrado, atualize o nome no `.env`.
 

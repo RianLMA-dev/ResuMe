@@ -37,7 +37,7 @@ def get_groq_llm():
         raise ValueError("GROQ_API_KEY não foi encontrada nas variáveis de ambiente.")
 
     return ChatGroq(
-        model="openai/gpt-oss-120b",
+        model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
         groq_api_key=api_key,
         temperature=0.2,
     )
