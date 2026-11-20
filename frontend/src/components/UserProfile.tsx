@@ -5,7 +5,6 @@ import { useState } from 'react'
 interface UserData {
   name: string
   email: string
-  autoSyncGmail: boolean
 }
 
 export function UserProfile() {
@@ -15,7 +14,6 @@ export function UserProfile() {
   const [user, setUser] = useState<UserData>({
     name: 'Desenvolvedor',
     email: 'dev@resume.app',
-    autoSyncGmail: true,
   })
 
   const [tempUser, setTempUser] = useState<UserData>(user)
@@ -125,15 +123,11 @@ export function UserProfile() {
 
               <div className="flex items-center justify-between rounded-lg border p-3" style={{ borderColor: 'var(--line)', backgroundColor: 'var(--bg)' }}>
                 <div>
-                  <p className="font-medium text-[color:var(--text)]">Sincronização Automática</p>
-                  <p className="text-xs text-[color:var(--muted)]">Ler e-mails da pasta Vagas</p>
+                  <p className="font-medium text-[color:var(--text)]">Sincronização automática</p>
+                  <p className="text-xs text-[color:var(--muted)]">
+                    Não é configurada aqui: roda pelo Agendador de Tarefas do Windows (veja o README). Para sincronizar na hora, use o botão Sincronizar Gmail do painel.
+                  </p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={tempUser.autoSyncGmail}
-                  onChange={(e) => setTempUser({ ...tempUser, autoSyncGmail: e.target.checked })}
-                  className="h-4 w-4 rounded accent-blue-600 cursor-pointer"
-                />
               </div>
 
               <div className="mt-2 flex justify-end gap-2 pt-3 border-t" style={{ borderColor: 'var(--line)' }}>
