@@ -1,22 +1,18 @@
+# Segredos e credenciais (nunca vão para o GitHub)
 .env
 backend/secrets/
 credentials.json
 token.json
 client_secret*.json
 
-backend/secrets/
-credentials.json
-token.json
-client_secret*.json
+# Python
 __pycache__/
 *.pyc
-backend/logs/
 
-backend/secrets/
+# Logs e dumps locais
 backend/logs/
-credentials.json
-token.json
-client_secret*.json
-__pycache__/
-*.pyc
 *.sql
+
+# Avaliação: nomes reais para anonimizar e resultado da última execução
+backend/evals/*.local.*
+backend/evals/last_run.json
