@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="frontend/public/logo-dark.png">
-    <img src="frontend/public/logo.png" alt="ResuMe" width="320">
+    <img src="frontend/public/logo-light.png" alt="ResuMe" width="320">
   </picture>
 </p>
 
@@ -200,9 +200,9 @@ O resultado `0` é sucesso, `2` é autorização do Gmail expirada e `1` é outr
 
 E-mails de recrutadores e currículos têm dados pessoais, então tentei me preocupar com isso desde o começo.
 
-- Antes de qualquer chamada a um modelo, o texto dos e-mails passa por uma sanitização que troca e-mails, telefones, CPFs e links por marcadores como `[EMAIL]`.
+- Antes de qualquer chamada a um modelo, o texto dos e-mails, do currículo e da descrição da vaga passa por uma sanitização que troca e-mails, telefones, CPFs e links por marcadores como `[EMAIL]`.
 - Ela é feita com expressões regulares, então **não pega nomes de pessoas**. Se isso for um problema, use o Ollama para os e-mails.
-- O texto dos e-mails vai para o Gemini, e o currículo e a descrição da vaga vão para o Grok. Tire do currículo o que você não quer compartilhar, como endereço e telefone, e leia a política de dados de cada provedor: em planos gratuitos, alguns usam o conteúdo para melhorar os modelos.
+- O texto dos e-mails vai para o Gemini, e o currículo e a descrição da vaga vão para o Groq. Tire do currículo o que você não quer compartilhar, como nome e endereço, e leia a política de dados de cada provedor: em planos gratuitos, alguns usam o conteúdo para melhorar os modelos.
 - No Gmail, o ResuMe só lê o que tem o marcador `Vagas`.
 - O ResuMe foi feito para rodar na sua máquina. **A API não tem login**, então não exponha as portas 3000, 8000 e 5432 na internet.
 

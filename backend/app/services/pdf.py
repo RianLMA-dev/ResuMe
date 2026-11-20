@@ -1,40 +1,58 @@
 import io
+import logging
 import re
+
 from pypdf import PdfReader
-from fastapi import HTTPException
+
+logger = logging.getLogger(__name__)
+
+MAX_PDF_BYTES = 5 * 1024 * 1024  # 5 MB
+MAX_PAGES = 15
+MIN_CHARS = 50
+MAX_CHARS = 30000  # mesmo limite do currículo salvo (ResumeUpsert)
+
+
+class PdfExtractionError(Exception):
+    """O PDF não pôde ser lido. A mensagem é segura para mostrar ao usuário."""
+
 
 def clean_text(text: str) -> str:
-    """Remove quebras de linha em excesso e múltiplos espaços fragmentados."""
+    """Limpa o texto sem apagar a estrutura: preserva as quebras de linha."""
     if not text:
         return ""
-    # Substitui sequências de quebras de linha e espaços por um único espaço
-    cleaned = re.sub(r'\s+', ' ', text)
-    return cleaned.strip()
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    text = re.sub(r"[^\S\n]+", " ", text)  # espaços e tabs repetidos viram um só
+    text = re.sub(r" ?\n ?", "\n", text)  # tira espaços nas pontas das linhas
+    text = re.sub(r"\n{3,}", "\n\n", text)  # no máximo uma linha em branco seguida
+    return text.strip()
+
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
-    """Extrai e sanitiza todo o texto contido em um arquivo PDF enviado em memória."""
+    """Extrai o texto de um PDF em memória. Levanta PdfExtractionError com mensagem segura."""
+    if len(file_bytes) > MAX_PDF_BYTES:
+        raise PdfExtractionError("O PDF passa de 5 MB.")
+    if not file_bytes.lstrip().startswith(b"%PDF"):
+        raise PdfExtractionError("O arquivo não parece ser um PDF.")
+
     try:
-        pdf_file = io.BytesIO(file_bytes)
-        reader = PdfReader(pdf_file)
-        extracted_text = []
+        reader = PdfReader(io.BytesIO(file_bytes))
+        if reader.is_encrypted:
+            raise PdfExtractionError("O PDF está protegido por senha.")
+        if len(reader.pages) > MAX_PAGES:
+            raise PdfExtractionError(f"O PDF tem mais de {MAX_PAGES} páginas.")
+        pages = [page.extract_text() or "" for page in reader.pages]
+    except PdfExtractionError:
+        raise
+    except Exception as exc:
+        # Só o tipo do erro vai para o log: o conteúdo do currículo nunca é registrado.
+        logger.warning("Falha ao ler PDF: %s", type(exc).__name__)
+        raise PdfExtractionError("Não consegui ler esse PDF.") from None
 
-        for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                extracted_text.append(text)
-
-        raw_text = "\n".join(extracted_text).strip()
-
-        if not raw_text:
-            raise HTTPException(
-                status_code=400,
-                detail="Não foi possível extrair texto do PDF. O arquivo pode ser uma imagem/digitalização."
-            )
-
-        # Normaliza o texto removendo os caracteres de espaço/quebra entre letras
-        return clean_text(raw_text)
-
-    except Exception as e:
-        if isinstance(e, HTTPException):
-            raise e
-        raise HTTPException(status_code=400, detail=f"Erro ao processar o arquivo PDF: {str(e)}")
+    text = clean_text("\n\n".join(pages))
+    if len(text) < MIN_CHARS:
+        raise PdfExtractionError(
+            "O PDF não tem texto selecionável (pode ser uma imagem escaneada)."
+        )
+    if len(text) > MAX_CHARS:
+        raise PdfExtractionError("O texto do PDF passa de 30.000 caracteres.")
+    return text
