@@ -254,7 +254,7 @@ O que a avaliação encontrou:
 
 - Na primeira rodada, o status do extrator estava em 93%. Em e-mails como "há uma novidade, acesse a plataforma", que não dizem a etapa, o modelo chutava `Em Análise` em vez de `Indefinido`. Com 4 casos novos, escritos só para conferir, o acerto desse tipo foi de 1 em 6 para 6 em 6 depois de ajustar o prompt.
 - Esse ajuste fez o modelo errar em candidaturas "não finalizadas". Foram necessárias duas regras a mais, uma para `Inscrito` e outra de precedência para `Rejeitado`, e um novo caso de conferência para cada uma.
-- Os testes expuseram um problema do sanitizador: ele confunde números de vaga de 8 dígitos com telefone (veja "O que falta fazer").
+- Os testes expuseram um problema do sanitizador: ele confunde números de vaga de 8 dígitos com telefone (já corrigido: o telefone agora exige DDD ou hífen, com testes em `test_sanitize.py`).
 
 Limites desta medição: o conjunto é pequeno e foi escrito à mão, e parte dos casos orientou os ajustes do prompt, então 100% aqui **não** significa 100% com e-mails reais. O modelo escolhido também não respeita `temperature`, e o resultado varia um ou dois casos entre rodadas. Os números servem para comparar versões do prompt e achar regressões, não como garantia de acerto.
 
@@ -284,7 +284,7 @@ python -m evals.run_eval --ids s29,s30   # só alguns casos
 - [ ] Aba de sugestões de vagas, lendo os alertas do LinkedIn e do Indeed
 - [ ] Logo da empresa nos cartões
 - [ ] Um jeito melhor de ligar e-mails diferentes ao mesmo processo (hoje a comparação é por texto)
-- [ ] Sanitizador: não tratar números de vaga (8 dígitos) como telefone
+- [x] Sanitizador: números de vaga (8 dígitos) não são mais tratados como telefone
 - [ ] Migrações com Alembic
 - [ ] Demonstração pública com dados de exemplo
 
