@@ -92,6 +92,8 @@ docker compose up --build
 
 Abra http://localhost:3000. A documentação da API fica em http://localhost:8000/docs.
 
+A primeira execução constrói as imagens e leva vários minutos (cerca de 6 em um teste com um clone limpo). As próximas sobem em segundos.
+
 Isso sobe três serviços: o banco (PostgreSQL), a API e o site. A API só inicia depois que o banco está pronto. O arquivo `.env` precisa ter só linhas no formato `CHAVE=valor`, sem aspas.
 
 O Gmail é opcional. Sem ele, dá para colar e-mails e usar todo o resto. Para ligá-lo, veja "Conectando o Gmail".
@@ -206,16 +208,20 @@ E-mails de recrutadores e currículos têm dados pessoais, então tentei me preo
 - No Gmail, o ResuMe só lê o que tem o marcador `Vagas`.
 - O ResuMe foi feito para rodar na sua máquina. **A API não tem login**, então não exponha as portas 3000, 8000 e 5432 na internet.
 
-Os dados ficam num volume do Docker (`pgdata`). Para fazer uma cópia de segurança:
+Os dados ficam num volume do Docker (`pgdata`). Para fazer uma cópia de segurança, rode na pasta do projeto:
 
 ```powershell
-docker exec resume-db pg_dump -U resume -d resume --clean --if-exists | Out-File -Encoding utf8 resume_backup.sql
+docker compose exec db pg_dump -U resume -d resume --clean --if-exists -f /tmp/backup.sql
+docker compose cp db:/tmp/backup.sql ./resume_backup.sql
 ```
 
-Guarde o arquivo fora do repositório, porque ele tem os seus dados. Para restaurar:
+O arquivo `resume_backup.sql` tem os seus dados pessoais. O `.gitignore` já ignora arquivos `.sql`, mas o melhor é movê-lo para fora do repositório. Não use `>` nem `| Out-File` do PowerShell para gravar o backup: ele regrava o texto com outra codificação e estraga os acentos.
+
+Para restaurar (com os contêineres de pé):
 
 ```powershell
-Get-Content resume_backup.sql | docker exec -i resume-db psql -U resume -d resume
+docker compose cp ./resume_backup.sql db:/tmp/restore.sql
+docker compose exec db psql -U resume -d resume -v ON_ERROR_STOP=1 -f /tmp/restore.sql
 ```
 
 Nunca rode `docker compose down -v` nem `docker system prune --volumes`: os dois apagam o banco.
