@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Dashboard from "@/components/Dashboard"
+import DemoBanner from "@/components/DemoBanner"
 import { HeaderMetrics } from "@/components/HeaderMetrics"
 import { Logo } from "@/components/Logo"
 import { SearchBar } from "@/components/SearchBar"
@@ -22,6 +23,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
+      <DemoBanner />
       <header 
         className="border-b px-6 py-3 flex items-center justify-between gap-4" 
         style={{ borderColor: "var(--line)" }}

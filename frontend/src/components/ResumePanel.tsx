@@ -11,7 +11,10 @@ import {
   uploadResumePdf, // Import da nova função
   type ResumeOptimization,
 } from "@/lib/api";
+import { SAMPLE_JOB } from "@/lib/demoSamples";
 import type { Application } from "@/lib/types";
+
+import { useDemo } from "./DemoProvider";
 
 type Message = { kind: "ok" | "info" | "error"; text: string };
 
@@ -54,6 +57,7 @@ export default function ResumePanel() {
   const [resumeMessage, setResumeMessage] = useState<Message | null>(null);
 
   const [job, setJob] = useState("");
+  const { enabled: isDemo } = useDemo();
   const [applications, setApplications] = useState<Application[]>([]);
   const [applicationId, setApplicationId] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
@@ -155,6 +159,8 @@ export default function ResumePanel() {
         setAnalysisMessage({ kind: "error", text: "Salve o seu currículo antes de analisar." });
       } else if (error instanceof ApiError && error.status === 404) {
         setAnalysisMessage({ kind: "error", text: "Essa candidatura não existe mais." });
+      } else if (error instanceof ApiError && [413, 429].includes(error.status)) {
+        setAnalysisMessage({ kind: "error", text: error.message });
       } else {
         setAnalysisMessage({ kind: "error", text: "Não consegui analisar. A API está rodando?" });
       }
@@ -266,6 +272,16 @@ export default function ResumePanel() {
             <label htmlFor="job-text" className="text-sm font-semibold">
               Descrição da vaga
             </label>
+            {isDemo && (
+              <button
+                type="button"
+                onClick={() => setJob(SAMPLE_JOB)}
+                className="w-fit rounded-md border px-2 py-1 text-xs transition-opacity hover:opacity-80"
+                style={{ borderColor: "var(--line)" }}
+              >
+                Usar vaga de exemplo
+              </button>
+            )}
             <textarea
               id="job-text"
               value={job}

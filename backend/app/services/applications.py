@@ -1,20 +1,27 @@
+from typing import Optional
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.demo import scope_filter
 from app.models import ApplicationRecord
 from app.schemas import ApplicationStatus, JobApplication
 
 
-def upsert_application(db: Session, data: JobApplication) -> ApplicationRecord:
+def upsert_application(
+    db: Session, data: JobApplication, session_id: Optional[str] = None
+) -> ApplicationRecord:
     record = db.scalar(
         select(ApplicationRecord).where(
             func.lower(ApplicationRecord.company_name) == data.company_name.lower(),
             func.lower(ApplicationRecord.job_title) == data.job_title.lower(),
+            scope_filter(ApplicationRecord.session_id, session_id),
         )
     )
 
     if record is None:
         record = ApplicationRecord(
+            session_id=session_id,
             company_name=data.company_name,
             job_title=data.job_title,
             company_domain=data.company_domain,  # <-- NOVO: Salva ao criar

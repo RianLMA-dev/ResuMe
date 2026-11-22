@@ -5,6 +5,7 @@ import EmailForm from "./EmailForm";
 import KanbanBoard from "./KanbanBoard";
 import SyncButton from "./SyncButton";
 import ResumePanel from "./ResumePanel";
+import { useDemo } from "./DemoProvider";
 
 interface DashboardProps {
   searchTerm?: string;
@@ -12,6 +13,7 @@ interface DashboardProps {
 
 export default function Dashboard({ searchTerm = "" }: DashboardProps) {
   const [refreshKey, setRefreshKey] = useState(0);
+  const { enabled: isDemo } = useDemo();
 
   const handleCreated = () => {
     setRefreshKey((prev) => prev + 1);
@@ -19,7 +21,7 @@ export default function Dashboard({ searchTerm = "" }: DashboardProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <SyncButton onSynced={handleCreated} />
+      {!isDemo && <SyncButton onSynced={handleCreated} />}
       <EmailForm onSaved={handleCreated} />
       <ResumePanel />
       <KanbanBoard refreshKey={refreshKey} searchTerm={searchTerm} />

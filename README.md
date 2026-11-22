@@ -153,6 +153,13 @@ alembic revision --autogenerate -m "descreva a mudanca"
 
 Depois reinicie a API. Um teste (`tests/test_migrations.py`) falha se os modelos e as migrações ficarem diferentes.
 
+## Demonstração pública
+
+O ResuMe tem um modo de demonstração (`DEMO_MODE=true`) para publicar uma versão no ar sem expor dados
+de ninguém: cada visitante recebe candidaturas fictícias só dele, os dados somem em poucas horas, o Gmail
+fica desligado e o uso da IA tem limites por visitante, por rede e por dia. Como ela funciona e como
+publicar a sua, de graça, está em [docs/demo-publica.md](docs/demo-publica.md).
+
 ## Qual modelo usar
 
 Cada pessoa usa as próprias chaves (_bring your own key_), e o código nunca depende de uma chave minha. O `.env.example` lista todas as variáveis.
