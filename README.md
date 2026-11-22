@@ -306,6 +306,7 @@ python -m evals.run_eval --ids s29,s30   # só alguns casos
 - [ ] Um jeito melhor de ligar e-mails diferentes ao mesmo processo (hoje a comparação é por texto)
 - [x] Sanitizador: números de vaga (8 dígitos) não são mais tratados como telefone
 - [x] Migrações com Alembic
+- [x] Auditoria de dependências no CI (pip-audit e npm audit) e atualizações semanais pelo Dependabot
 - [ ] Demonstração pública com dados de exemplo
 
 ## Licença
