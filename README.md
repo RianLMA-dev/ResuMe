@@ -133,11 +133,25 @@ ResuMe/
 │   │   ├── models/     tabelas
 │   │   ├── schemas/    formatos de entrada e saída
 │   │   └── services/   Gmail, sanitização e sincronização
+│   ├── migrations/     migrações do banco (Alembic)
 │   ├── tests/
 │   └── sync_job.py     sincronização agendada
 ├── frontend/           site em Next.js
 └── docker-compose.yml
 ```
+
+## Banco de dados e migrações
+
+O esquema do banco é versionado com o [Alembic](https://alembic.sqlalchemy.org). A API aplica as migrações sozinha ao iniciar (e o job agendado também), então não há comando extra para rodar. Um banco criado antes do Alembic é reconhecido e adotado sem perder dados.
+
+Para mudar uma tabela, edite o modelo em `backend/app/models/`, gere a migração e revise o arquivo criado:
+
+```powershell
+cd backend
+alembic revision --autogenerate -m "descreva a mudanca"
+```
+
+Depois reinicie a API. Um teste (`tests/test_migrations.py`) falha se os modelos e as migrações ficarem diferentes.
 
 ## Qual modelo usar
 
@@ -291,7 +305,7 @@ python -m evals.run_eval --ids s29,s30   # só alguns casos
 - [ ] Logo da empresa nos cartões
 - [ ] Um jeito melhor de ligar e-mails diferentes ao mesmo processo (hoje a comparação é por texto)
 - [x] Sanitizador: números de vaga (8 dígitos) não são mais tratados como telefone
-- [ ] Migrações com Alembic
+- [x] Migrações com Alembic
 - [ ] Demonstração pública com dados de exemplo
 
 ## Licença
