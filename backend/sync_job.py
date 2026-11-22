@@ -4,7 +4,8 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from app import models  # noqa: F401  (registra as tabelas)
-from app.db import Base, SessionLocal, engine
+from app.db import SessionLocal
+from app.migrate import run_migrations
 from app.services.scheduled_sync import EXIT_ERROR, run_scheduled_sync
 
 LOG_FILE = Path(__file__).resolve().parent / "logs" / "sync.log"
@@ -29,7 +30,7 @@ def main() -> int:
     log.info("Iniciando sincronização agendada")
 
     try:
-        Base.metadata.create_all(bind=engine)
+        run_migrations()
     except Exception:
         log.exception("Banco indisponível. O Docker Desktop está aberto e o contêiner db rodando?")
         return EXIT_ERROR

@@ -1,3 +1,4 @@
+alembic==1.20.1
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
@@ -38,6 +39,8 @@ langgraph-checkpoint==4.3.1
 langgraph-prebuilt==1.1.1
 langgraph-sdk==0.4.10
 langsmith==0.14.16
+Mako==1.4.3
+MarkupSafe==3.0.4
 oauthlib==4.0.1
 opentelemetry-api==1.45.2
 orjson==3.13.0
