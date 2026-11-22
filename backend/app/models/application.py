@@ -18,6 +18,8 @@ class ApplicationRecord(Base):
     company_name: Mapped[str] = mapped_column(String(200), index=True)
     job_title: Mapped[str] = mapped_column(String(200), index=True)
     company_domain: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)  # <-- NOVO CAMPO
+    # Só usado na demonstração pública: separa os dados de cada visitante (NULL = uso normal).
+    session_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
     status: Mapped[str] = mapped_column(String(50))
     key_requirements: Mapped[List[str]] = mapped_column(JSON, default=list)
     next_steps: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

@@ -9,6 +9,7 @@ from app import models  # noqa: F401  (registra as tabelas)
 from app.api.applications import router as applications_router
 from app.api.emails import router as emails_router
 from app.api.gmail import router as gmail_router
+from app.demo import public_config
 from app.migrate import run_migrations
 from app.api.resume import router as resume_router
 
@@ -43,3 +44,9 @@ app.include_router(resume_router)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/config")
+def config():
+    """Informações públicas para o site (por exemplo, se esta é a demonstração)."""
+    return public_config()

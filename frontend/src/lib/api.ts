@@ -2,6 +2,52 @@ import type { Application, Status } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
+// Hospedado (a demonstração): o servidor gratuito dorme e leva cerca de 1 minuto para acordar.
+export const isHosted = !/^https?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(API_URL);
+
+const SESSION_KEY = "resume-demo-session";
+
+/** Identificador do visitante na demonstração. Fora dela, o back-end ignora o cabeçalho. */
+function demoSessionId(): string {
+  try {
+    const saved = window.localStorage.getItem(SESSION_KEY);
+    if (saved) return saved;
+    const created = crypto.randomUUID();
+    window.localStorage.setItem(SESSION_KEY, created);
+    return created;
+  } catch {
+    return crypto.randomUUID();
+  }
+}
+
+function sessionHeaders(): Record<string, string> {
+  return typeof window === "undefined" ? {} : { "X-Demo-Session": demoSessionId() };
+}
+
+export interface PublicConfig {
+  demo: boolean;
+  session_ttl_hours: number;
+  max_email_chars: number;
+  max_job_chars: number;
+}
+
+export const getConfig = () => request<PublicConfig>("/config", { cache: "no-store" });
+
+/** Espera a API responder (acordar o servidor gratuito). Devolve false se passar do tempo. */
+export async function waitForApi(timeoutMs = 100_000): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`${API_URL}/health`, { cache: "no-store" });
+      if (response.ok) return true;
+    } catch {
+      // ainda dormindo: tenta de novo
+    }
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+  }
+  return false;
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -25,10 +71,21 @@ export interface GmailSyncResult {
   stopped_by_error: boolean;
 }
 
+async function errorMessage(response: Response, fallback: string): Promise<string> {
+  const body = await response.json().catch(() => null);
+  return typeof body?.detail === "string" ? body.detail : fallback;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, init);
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: { ...sessionHeaders(), ...(init?.headers as Record<string, string> | undefined) },
+  });
   if (!response.ok) {
-    throw new ApiError(response.status, `Erro ${response.status} ao chamar ${path}`);
+    throw new ApiError(
+      response.status,
+      await errorMessage(response, `Erro ${response.status} ao chamar ${path}`),
+    );
   }
   if (response.status === 204) {
     return undefined as T;
@@ -89,30 +146,18 @@ export async function uploadResumePdf(file: File): Promise<{ id: number; content
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch("http://localhost:8000/resume/upload", {
+  const response = await fetch(`${API_URL}/resume/upload`, {
     method: "POST",
+    headers: sessionHeaders(),
     body: formData,
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new ApiError(response.status, errorData.detail || "Erro ao fazer upload do PDF.");
+    throw new ApiError(response.status, await errorMessage(response, "Erro ao fazer upload do PDF."));
   }
 
   return response.json();
 }
 
-export async function optimizeForApplication(applicationId: number) {
-  const response = await fetch("http://127.0.0.1:8000/optimize", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ application_id: applicationId }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || "Erro ao analisar currículo.");
-  }
-
-  return response.json();
-}
+export const optimizeForApplication = (applicationId: number) =>
+  optimizeResume({ application_id: applicationId });

@@ -1,0 +1,28 @@
+# Blueprint do Render para a API da demonstração pública (plano gratuito).
+# O site (frontend) vai para o Vercel. Passo a passo em docs/demo-publica.md.
+services:
+  - type: web
+    name: resume-demo-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: DEMO_MODE
+        value: "true"
+      # Banco em arquivo: no plano gratuito o disco é apagado quando o servidor dorme, e isso
+      # é o desejado na demonstração (os dados são fictícios e descartáveis).
+      - key: DATABASE_URL
+        value: sqlite:////tmp/resume-demo.db
+      - key: DEMO_SALT
+        generateValue: true
+      # Use chaves criadas só para a demonstração, em contas sem cartão cadastrado.
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      # Endereço do site no Vercel, sem barra no final. Ex.: https://resume-demo.vercel.app
+      - key: CORS_ORIGINS
+        sync: false

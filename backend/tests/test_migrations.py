@@ -33,13 +33,13 @@ def test_banco_novo_fica_igual_aos_modelos(engine):
     with engine.connect() as conn:
         diff = compare_metadata(MigrationContext.configure(conn), Base.metadata)
     assert diff == [], f"modelos e migrações divergem: {diff}"
-    assert _version(engine) == "0002"
+    assert _version(engine) == "0003"
 
 
 def test_rodar_duas_vezes_nao_quebra(engine):
     run_migrations(engine)
     run_migrations(engine)
-    assert _version(engine) == "0002"
+    assert _version(engine) == "0003"
 
 
 def test_banco_antigo_do_create_all_e_adotado_sem_perder_dados(engine):
@@ -56,7 +56,7 @@ def test_banco_antigo_do_create_all_e_adotado_sem_perder_dados(engine):
 
     run_migrations(engine)
 
-    assert _version(engine) == "0002"
+    assert _version(engine) == "0003"
     with engine.connect() as conn:
         assert conn.execute(text("SELECT company_name FROM applications")).scalar_one() == "Acme"
 
@@ -76,9 +76,42 @@ def test_banco_antigo_sem_company_domain_ganha_a_coluna(engine):
                 "'2026-01-01 00:00:00', '2026-01-01 00:00:00')"
             )
         )
+        conn.execute(
+            text(
+                "CREATE TABLE base_resume (id INTEGER PRIMARY KEY, content TEXT NOT NULL, "
+                "updated_at DATETIME NOT NULL)"
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE TABLE processed_emails (id INTEGER PRIMARY KEY, gmail_id VARCHAR(64) NOT NULL, "
+                "outcome VARCHAR(20) NOT NULL, application_id INTEGER, processed_at DATETIME NOT NULL)"
+            )
+        )
 
     run_migrations(engine)
 
     assert "company_domain" in _columns(engine, "applications")
     with engine.connect() as conn:
         assert conn.execute(text("SELECT company_name FROM applications")).scalar_one() == "Acme"
+
+
+def test_descer_e_subir_de_novo_nao_perde_o_esquema(engine):
+    from alembic import command
+
+    from app.migrate import _config
+
+    run_migrations(engine)
+    config = _config()
+    with engine.begin() as connection:
+        config.attributes["connection"] = connection
+        command.downgrade(config, "0002")
+
+    assert "session_id" not in _columns(engine, "applications")
+    assert "demo_sessions" not in inspect(engine).get_table_names()
+
+    run_migrations(engine)
+
+    assert _version(engine) == "0003"
+    assert "session_id" in _columns(engine, "applications")
+    assert "demo_sessions" in inspect(engine).get_table_names()

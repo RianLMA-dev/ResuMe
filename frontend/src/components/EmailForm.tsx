@@ -3,6 +3,9 @@
 import { useState } from "react";
 
 import { ApiError, analyzeEmail } from "@/lib/api";
+import { SAMPLE_EMAILS } from "@/lib/demoSamples";
+
+import { useDemo } from "./DemoProvider";
 
 type Message = { kind: "ok" | "info" | "error"; text: string };
 
@@ -16,6 +19,7 @@ export default function EmailForm({ onSaved }: { onSaved: () => void }) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
+  const { enabled: isDemo } = useDemo();
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -42,6 +46,11 @@ export default function EmailForm({ onSaved }: { onSaved: () => void }) {
     } catch (error) {
       if (error instanceof ApiError && error.status === 422) {
         setMessage({ kind: "error", text: "O texto está curto demais. Cole o e-mail completo." });
+      } else if (
+        error instanceof ApiError &&
+        [409, 413, 429].includes(error.status)
+      ) {
+        setMessage({ kind: "error", text: error.message });
       } else if (error instanceof ApiError && error.status === 502) {
         setMessage({
           kind: "error",
@@ -64,6 +73,22 @@ export default function EmailForm({ onSaved }: { onSaved: () => void }) {
       <label htmlFor="email-text" className="mb-2 block text-sm font-semibold">
         Cole o e-mail de uma vaga
       </label>
+      {isDemo && (
+        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-[color:var(--muted)]">Experimente um exemplo:</span>
+          {SAMPLE_EMAILS.map((sample) => (
+            <button
+              key={sample.label}
+              type="button"
+              onClick={() => setText(sample.text)}
+              className="rounded-md border px-2 py-1 transition-opacity hover:opacity-80"
+              style={{ borderColor: "var(--line)" }}
+            >
+              {sample.label}
+            </button>
+          ))}
+        </div>
+      )}
       <textarea
         id="email-text"
         value={text}

@@ -2,10 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.demo import block_in_demo
 from app.services.gmail import GmailAuthError
 from app.services.gmail_sync import GmailSyncResult, sync_gmail
 
-router = APIRouter(prefix="/gmail", tags=["gmail"])
+router = APIRouter(prefix="/gmail", tags=["gmail"], dependencies=[Depends(block_in_demo)])
 
 
 @router.post("/sync", response_model=GmailSyncResult)
