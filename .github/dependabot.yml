@@ -13,6 +13,12 @@ updates:
     groups:
       python:
         update-types: [minor, patch]
+    ignore:
+      # Limitados por pacotes que dependem deles; o pip não resolve se subirem sozinhos.
+      - dependency-name: tenacity        # google-genai exige tenacity < 9.2
+        update-types: [version-update:semver-minor, version-update:semver-major]
+      - dependency-name: uuid-utils      # langsmith exige uuid-utils < 1.0
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: npm
     directory: /frontend
