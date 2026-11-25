@@ -9,6 +9,8 @@
 
 ![CI](https://github.com/RianLMA-dev/ResuMe/actions/workflows/ci.yml/badge.svg)
 
+**[Experimente a demonstração online](https://resu-me-weld.vercel.app)**, com dados fictícios e sem instalar nada. Na primeira abertura, o servidor gratuito leva cerca de 1 minuto para acordar.
+
 O nome é um trocadilho entre _resume_ (currículo) e _me_ (eu). A ideia é ter um assistente pessoal para cuidar das minhas candidaturas.
 
 Comecei esse projeto porque, quando você se candidata a muitas vagas ao mesmo tempo, perde o controle rápido: em qual etapa cada processo está, quem já respondeu, quem recusou. E ainda tem o trabalho de adaptar o currículo para cada vaga. O ResuMe tenta resolver as duas coisas com agentes de IA.
@@ -34,7 +36,7 @@ Também é meu projeto de portfólio na trilha de AI Engineer, então está em d
 **Adaptar o currículo**
 
 - Você envia o seu currículo em PDF (ou cola o texto) e a descrição de uma vaga. O Resume Optimizer devolve uma nota de compatibilidade, as palavras da vaga que faltam no currículo e sugestões de frases.
-- Ele foi instruído a nunca inventar experiência: se a vaga pede uma tecnologia que você não usou, ela aparece como "faltando" e não vira uma frase fingindo que você sabe.
+- Ele foi instruído a não inventar experiência: se a vaga pede uma tecnologia que você não usou, ela aparece como "faltando" e não vira uma frase fingindo que você sabe. Mesmo assim, o modelo pode exagerar uma frase (já vi citar "integração contínua" sem constar no currículo), então confira se cada sugestão é verdadeira antes de usar.
 - A nota é uma estimativa do modelo, não uma medida exata. Use como guia e revise cada sugestão.
 - A análise é para fazer **antes** de se inscrever. Por isso não existe um botão de analisar nos cartões do quadro: quem já está inscrito já mandou o currículo.
 
@@ -159,6 +161,8 @@ O ResuMe tem um modo de demonstração (`DEMO_MODE=true`) para publicar uma vers
 de ninguém: cada visitante recebe candidaturas fictícias só dele, os dados somem em poucas horas, o Gmail
 fica desligado e o uso da IA tem limites por visitante, por rede e por dia. Como ela funciona e como
 publicar a sua, de graça, está em [docs/demo-publica.md](docs/demo-publica.md).
+
+A minha está em https://resu-me-weld.vercel.app (API no Render e site no Vercel, ambos em planos gratuitos). Ela usa chaves de IA próprias, com cota limitada: se o limite do dia acabar, ela avisa e volta no dia seguinte.
 
 ## Qual modelo usar
 
@@ -314,7 +318,7 @@ python -m evals.run_eval --ids s29,s30   # só alguns casos
 - [x] Sanitizador: números de vaga (8 dígitos) não são mais tratados como telefone
 - [x] Migrações com Alembic
 - [x] Auditoria de dependências no CI (pip-audit e npm audit) e atualizações semanais pelo Dependabot
-- [ ] Demonstração pública com dados de exemplo
+- [x] Demonstração pública com dados de exemplo
 
 ## Licença
 
