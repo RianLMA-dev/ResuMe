@@ -16,6 +16,7 @@ export const useDemo = () => useContext(DemoContext);
 export function DemoProvider({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<"waiting" | "ready" | "failed">(isHosted ? "waiting" : "ready");
   const [state, setState] = useState<DemoState>({ enabled: false, ttlHours: 6 });
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +39,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [attempt]);
 
   if (phase !== "ready") {
     return (
@@ -50,8 +51,20 @@ export function DemoProvider({ children }: { children: ReactNode }) {
           <p className="mt-2 text-sm text-[color:var(--muted)]">
             {phase === "waiting"
               ? "O servidor gratuito dorme quando ninguém usa e leva até 1 minuto para acordar. Só no primeiro acesso."
-              : "Recarregue a página em instantes. Se continuar, o limite de uso da hospedagem pode ter acabado."}
+              : "O servidor demorou demais ou a conexão foi bloqueada (um bloqueador de anúncios pode causar isso). Tente de novo; se continuar, o limite de uso da hospedagem pode ter acabado."}
           </p>
+          {phase === "failed" && (
+            <button
+              type="button"
+              onClick={() => {
+                setPhase("waiting");
+                setAttempt((n) => n + 1);
+              }}
+              className="mt-4 rounded-lg border border-[color:var(--muted)] px-4 py-2 text-sm font-medium"
+            >
+              Tentar de novo
+            </button>
+          )}
         </div>
       </div>
     );

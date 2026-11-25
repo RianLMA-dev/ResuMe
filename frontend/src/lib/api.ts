@@ -1,9 +1,12 @@
 import type { Application, Status } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const REMOTE_API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 // Hospedado (a demonstração): o servidor gratuito dorme e leva cerca de 1 minuto para acordar.
-export const isHosted = !/^https?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(API_URL);
+export const isHosted = !/^https?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(REMOTE_API_URL);
+
+// Hospedado, as chamadas vão para /backend no próprio site (ver rewrites em next.config.mjs).
+const API_URL = isHosted ? "/backend" : REMOTE_API_URL;
 
 const SESSION_KEY = "resume-demo-session";
 
@@ -34,11 +37,15 @@ export interface PublicConfig {
 export const getConfig = () => request<PublicConfig>("/config", { cache: "no-store" });
 
 /** Espera a API responder (acordar o servidor gratuito). Devolve false se passar do tempo. */
-export async function waitForApi(timeoutMs = 100_000): Promise<boolean> {
+export async function waitForApi(timeoutMs = 150_000): Promise<boolean> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
-      const response = await fetch(`${API_URL}/health`, { cache: "no-store" });
+      // Cada tentativa tem limite próprio: uma chamada travada não pode gastar a espera inteira.
+      const response = await fetch(`${API_URL}/health`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(12_000),
+      });
       if (response.ok) return true;
     } catch {
       // ainda dormindo: tenta de novo
