@@ -48,6 +48,11 @@ cadastrado. Assim, o pior caso é a demonstração parar de responder quando a c
 No Render, abra o serviço, vá em **Environment** e coloque em `CORS_ORIGINS` o endereço do site do Vercel
 (sem barra no final). Salve: o serviço reinicia sozinho. Abra o site e teste.
 
+O navegador não chama o Render direto: o site pede tudo para `/backend/...` no próprio endereço do Vercel, e o Vercel
+repassa à API (`rewrites` em `frontend/next.config.mjs`). Isso evita que bloqueadores de anúncios barrem a chamada
+para `onrender.com`. Por causa desse segundo proxy, o `render.yaml` define `DEMO_TRUSTED_PROXIES=2`, para os limites
+por rede enxergarem o IP do visitante e não o do Vercel.
+
 ## Limites do plano gratuito
 
 - O servidor do Render **dorme depois de 15 minutos sem acesso** e leva cerca de 1 minuto para acordar.

@@ -23,6 +23,10 @@ services:
         sync: false
       - key: GROQ_API_KEY
         sync: false
+      # O site no Vercel repassa as chamadas ao Render: são 2 proxies na frente da API, e o IP
+      # do visitante é o penúltimo da lista X-Forwarded-For.
+      - key: DEMO_TRUSTED_PROXIES
+        value: "2"
       # Endereço do site no Vercel, sem barra no final. Ex.: https://resume-demo.vercel.app
       - key: CORS_ORIGINS
         sync: false
