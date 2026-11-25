@@ -81,7 +81,7 @@ def main() -> None:
             r = ext[field]
             print(f"{label}: {pct(r['accuracy'])} ({r['hits']}/{r['total']})")
     else:
-        print("\nNenhum caso conferido para o extrator ainda (troque 'verify' por false em selection.json).")
+        print("\nNenhum e-mail de vaga nesta seleção, então o extrator não entrou na nota.")
 
     if ambiguous:
         print("\n=== Ambíguos (fora da nota) ===")
